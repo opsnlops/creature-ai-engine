@@ -32,16 +32,17 @@ std::string createAssistant() {
 
     // Set up tools using C++ data structures
     creatures::Tool codeInterpreter;
-    codeInterpreter.type = "function";
+    codeInterpreter.type = "code_interpreter";
     config.tools.push_back(codeInterpreter);
 
     config.model = "gpt-4-1106-preview";
 
     json data = config.to_json();
+    std::string messageBodyData = data.dump().c_str();
 
-    std::cout << "Request Body" << std::endl <<data.dump(4) << std::endl;
+    std::cout << "Request Body" << std::endl << messageBodyData << std::endl;
+    std::cout << messageBodyData << std::endl;
 
-    std::cout << data.dump().c_str() << std::endl;
 
     std::string authHeader = "Authorization: Bearer " + std::string(apiKey);
 
@@ -53,7 +54,8 @@ std::string createAssistant() {
     curl_easy_setopt(curl, CURLOPT_URL, "https://api.openai.com/v1/assistants");
     curl_easy_setopt(curl, CURLOPT_POST, 1L); // Explicitly set the request to POST
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
-    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data.dump().c_str());
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, messageBodyData.c_str());
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, messageBodyData.length());
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
 
